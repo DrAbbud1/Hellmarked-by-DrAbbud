@@ -1,0 +1,24 @@
+modLoader = "javafml"
+loaderVersion = "${LOADER_VERSION_RANGE}"
+license = "All Rights Reserved"
+
+[[mods]]
+modId = "infernalplus"
+version = "${MOD_VERSION}"
+displayName = "Infernal Plus"
+description = '''Aplica modificadores aleatorios estilo Infernal Mobs a todas las entidades hostiles (vanilla y de otros mods).'''
+authors = "DrAbbud"
+
+[[dependencies.infernalplus]]
+modId = "neoforge"
+type = "required"
+versionRange = "${NEO_VERSION_RANGE}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.infernalplus]]
+modId = "minecraft"
+type = "required"
+versionRange = "${MINECRAFT_VERSION_RANGE}"
+ordering = "NONE"
+side = "BOTH"
