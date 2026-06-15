@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.78'
+}
+
+version = '1.0.0'
+group = 'com.drabbud.infernalplus'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = '21.1.115'
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        infernalplus {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+        MOD_VERSION: version,
+        MINECRAFT_VERSION_RANGE: '[1.21.1,1.22)',
+        NEO_VERSION_RANGE: '[21.1.0,)',
+        LOADER_VERSION_RANGE: '[4,)'
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+}

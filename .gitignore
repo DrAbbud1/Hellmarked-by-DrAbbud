@@ -1,0 +1,55 @@
+# Gradle
+build/
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.gradletasknamecache
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Minecraft Development
+run/
+.mixin.out/
+
+# Java
+*.class
+*.jar
+*.zip
+*.tar.gz
+*.rar
+*.log
+hs_err_pid*
+.classpath
+.project
+.settings/
+
+# Environment
+.env
+local.properties
+
+# OS
+Thumbs.db
+*.bak
+
+# Maven (if applicable)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+pom.xml.bak
+
+# Kotlin
+.kotlin/
