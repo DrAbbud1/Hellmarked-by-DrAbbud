@@ -40,7 +40,8 @@ public final class ApotheosisLoot {
         return apotheosisPresent;
     }
 
-    public static void dropFor(LivingEntity mob, InfernalData data) {
+    public static void dropFor(LivingEntity mob, InfernalData data,
+                               net.minecraft.world.damagesource.DamageSource source) {
         if (!IPConfig.APOTH_LOOT_ENABLED.get()) return;
         if (!isApotheosisLoaded()) return;
         if (!(mob.level() instanceof ServerLevel level)) return;
@@ -64,18 +65,30 @@ public final class ApotheosisLoot {
         }
         if (table == LootTable.EMPTY) return;
 
-        LootParams params = new LootParams.Builder(level)
-                .withParameter(LootContextParams.ORIGIN, mob.position())
-                .withParameter(LootContextParams.THIS_ENTITY, mob)
-                .withOptionalParameter(LootContextParams.LAST_DAMAGE_PLAYER, nearestPlayer(mob))
-                .create(LootContextParamSets.ENTITY);
+        // el conjunto ENTITY exige DAMAGE_SOURCE; si no hay, usamos un genérico para no crashear
+        net.minecraft.world.damagesource.DamageSource dmgSource = source != null
+                ? source
+                : level.damageSources().generic();
 
-        List<ItemStack> loot = table.getRandomItems(params);
-        for (ItemStack stack : loot) {
-            if (!stack.isEmpty()) {
-                // API change: spawnAtLocation(ItemStack, float) is used in mappings
-                mob.spawnAtLocation(stack, 0.0F);
+        try {
+            LootParams params = new LootParams.Builder(level)
+                    .withParameter(LootContextParams.ORIGIN, mob.position())
+                    .withParameter(LootContextParams.THIS_ENTITY, mob)
+                    .withParameter(LootContextParams.DAMAGE_SOURCE, dmgSource)
+                    .withOptionalParameter(LootContextParams.ATTACKING_ENTITY, dmgSource.getEntity())
+                    .withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, dmgSource.getDirectEntity())
+                    .withOptionalParameter(LootContextParams.LAST_DAMAGE_PLAYER, nearestPlayer(mob))
+                    .create(LootContextParamSets.ENTITY);
+
+            List<ItemStack> loot = table.getRandomItems(params);
+            for (ItemStack stack : loot) {
+                if (!stack.isEmpty()) {
+                    mob.spawnAtLocation(stack, 0.0F);
+                }
             }
+        } catch (Exception e) {
+            // nunca dejar que el loot tumbe el servidor
+            InfernalPlus.LOGGER.warn("Fallo generando loot infernal de Apotheosis: {}", e.getMessage());
         }
     }
 

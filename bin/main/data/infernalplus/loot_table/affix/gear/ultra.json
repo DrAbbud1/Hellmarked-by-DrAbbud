@@ -1,0 +1,16 @@
+{
+  "_comment": "PLANTILLA - ajusta para tu version de Apotheosis. Esta tabla debe generar gear con afijos. Con Apotheosis instalado, reemplaza 'entries' por una referencia a la tabla de afijos de Apotheosis (p.ej. type apotheosis:affix_loot o un loot_table de su namespace). Apotheosis escala la rareza por World Tier automaticamente.",
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_sword",
+          "_comment_ultra": "placeholder - sustituir por entrada de afijo de Apotheosis para el tier 'ultra'"
+        }
+      ]
+    }
+  ]
+}

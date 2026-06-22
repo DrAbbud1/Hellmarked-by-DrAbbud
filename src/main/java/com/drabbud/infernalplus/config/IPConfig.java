@@ -22,6 +22,7 @@ public final class IPConfig {
     public static final ModConfigSpec.DoubleValue KAMIKAZE_POWER;
     public static final ModConfigSpec.IntValue KAMIKAZE_FUSE_TICKS;
     public static final ModConfigSpec.BooleanValue KAMIKAZE_INSTANT;
+    public static final ModConfigSpec.DoubleValue KAMIKAZE_DIRECT_DAMAGE;
 
     // awareness
     public static final ModConfigSpec.BooleanValue AWARENESS_ENABLED;
@@ -36,11 +37,32 @@ public final class IPConfig {
     public static final ModConfigSpec.DoubleValue AWARENESS_BACKSTAB_BONUS;
     public static final ModConfigSpec.BooleanValue AWARENESS_AFFECTS_STRENGTH;
 
+    // visual
+    public static final ModConfigSpec.BooleanValue GLOW_ENABLED;
+
     // loot / apotheosis
     public static final ModConfigSpec.BooleanValue APOTH_LOOT_ENABLED;
     public static final ModConfigSpec.DoubleValue APOTH_DROP_CHANCE_ELITE;
     public static final ModConfigSpec.DoubleValue APOTH_DROP_CHANCE_ULTRA;
     public static final ModConfigSpec.DoubleValue APOTH_DROP_CHANCE_INFERNAL;
+
+    // nombres meme
+    public static final ModConfigSpec.BooleanValue MEME_NAMES_ENABLED;
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> MEME_CUSTOM_NAMES;
+
+    // xp bonus
+    public static final ModConfigSpec.BooleanValue XP_BONUS_ENABLED;
+    public static final ModConfigSpec.DoubleValue XP_PER_MODIFIER;
+
+    // corazones de vida (drop)
+    public static final ModConfigSpec.IntValue LIFE_HEART_MAX;
+    public static final ModConfigSpec.DoubleValue LIFE_HEART_DROP_PER_MOD;
+
+    // cristal de armadura (drop)
+    public static final ModConfigSpec.IntValue ARMOR_CRYSTAL_MAX;
+    public static final ModConfigSpec.DoubleValue ARMOR_CRYSTAL_DROP_PER_MOD;
+    public static final ModConfigSpec.IntValue DAMAGE_CRYSTAL_MAX;
+    public static final ModConfigSpec.IntValue SPEED_CRYSTAL_MAX;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -83,6 +105,8 @@ public final class IPConfig {
                 .defineInRange("fuseTicks", 30, 1, 200);
         KAMIKAZE_INSTANT = b.comment("Si true, detona al instante sin fusible (instakill sin aviso). NO recomendado: se siente injusto.")
                 .define("instant", false);
+        KAMIKAZE_DIRECT_DAMAGE = b.comment("Daño directo garantizado en el centro de la explosión (decrece con la distancia). Más difícil de mitigar que la explosión vanilla, para que el kamikaze sea una amenaza real con armadura late-game. 20 = 10 corazones a quemarropa.")
+                .defineInRange("directDamage", 20.0, 0.0, 200.0);
         b.pop();
 
         b.push("awareness");
@@ -115,14 +139,54 @@ public final class IPConfig {
         b.pop();
 
         b.push("apotheosis_loot");
-        APOTH_LOOT_ENABLED = b.comment("Si Apotheosis está instalado, los infernales sueltan equipo con afijos. Apotheosis escala la rareza por World Tier.")
-                .define("enabled", true);
+        APOTH_LOOT_ENABLED = b.comment("Si Apotheosis está instalado, los infernales sueltan equipo con afijos. Apotheosis escala la rareza por World Tier. DESACTIVADO por defecto: actívalo solo cuando hayas ajustado las loot tables en data/infernalplus/loot_table/affix/gear/ para tu version de Apotheosis.")
+                .define("enabled", false);
         APOTH_DROP_CHANCE_ELITE = b.comment("Probabilidad (0-1) de soltar un objeto con afijo para mobs Elite.")
                 .defineInRange("dropChanceElite", 0.25, 0.0, 1.0);
         APOTH_DROP_CHANCE_ULTRA = b.comment("Probabilidad para mobs Ultra.")
                 .defineInRange("dropChanceUltra", 0.6, 0.0, 1.0);
         APOTH_DROP_CHANCE_INFERNAL = b.comment("Probabilidad para mobs Infernal (1.0 = garantizado).")
                 .defineInRange("dropChanceInfernal", 1.0, 0.0, 1.0);
+        b.pop();
+
+        b.push("meme_names");
+        MEME_NAMES_ENABLED = b.comment("Los infernales de tier alto (Ultra/Infernal) reciben un nombre meme aleatorio (ej. 'Rey Jochis Supremo').")
+                .define("enabled", true);
+        MEME_CUSTOM_NAMES = b.comment("Apodos personalizados que se añaden al pool de nombres meme. Pon aquí los nombres de tus amigos o lo que quieras.")
+                .defineListAllowEmpty("customNames", List.of("Jochis", "Abbud"),
+                        () -> "Pana", o -> o instanceof String);
+        b.pop();
+
+        b.push("xp_bonus");
+        XP_BONUS_ENABLED = b.comment("Los infernales sueltan más XP cuantos más modificadores tengan.")
+                .define("enabled", true);
+        XP_PER_MODIFIER = b.comment("XP extra por cada modificador (como fracción de la base). 0.4 => un mob de 10 mods da 5x la XP normal.")
+                .defineInRange("xpPerModifier", 0.4, 0.0, 10.0);
+        b.pop();
+
+        b.push("life_heart");
+        LIFE_HEART_MAX = b.comment("Máximo de corazones de vida que un jugador puede consumir (cada uno = +2 HP).")
+                .defineInRange("maxHearts", 10, 1, 100);
+        LIFE_HEART_DROP_PER_MOD = b.comment("Probabilidad de soltar un corazón por cada modificador del infernal. 0.03 => un mob de 10 mods tiene ~30% de soltar uno.")
+                .defineInRange("dropChancePerModifier", 0.03, 0.0, 1.0);
+        b.pop();
+
+        b.push("armor_crystal");
+        ARMOR_CRYSTAL_MAX = b.comment("Máximo de cristales de armadura (+1 cada uno) por pieza de equipo.")
+                .defineInRange("maxPerItem", 10, 1, 100);
+        ARMOR_CRYSTAL_DROP_PER_MOD = b.comment("Probabilidad de soltar un cristal por cada modificador del infernal.")
+                .defineInRange("dropChancePerModifier", 0.025, 0.0, 1.0);
+        DAMAGE_CRYSTAL_MAX = b.comment("Máximo de cristales de daño (+1 de daño cada uno) por arma.")
+                .defineInRange("maxDamagePerItem", 10, 1, 100);
+        SPEED_CRYSTAL_MAX = b.comment("Máximo de cristales de velocidad (+0.2 velocidad de ataque cada uno) por arma.")
+                .defineInRange("maxSpeedPerItem", 10, 1, 100);
+        b.pop();
+
+        ModifierWeights.define(b);
+
+        b.push("visual");
+        GLOW_ENABLED = b.comment("Los infernales tienen contorno brillante (glow) visible a distancia y a través de paredes.")
+                .define("glowEnabled", true);
         b.pop();
 
         SPEC = b.build();

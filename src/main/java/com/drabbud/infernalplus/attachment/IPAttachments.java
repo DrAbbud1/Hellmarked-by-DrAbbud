@@ -25,5 +25,13 @@ public final class IPAttachments {
                     .serialize(com.drabbud.infernalplus.awareness.AwarenessData.CODEC)
                     .build());
 
+    // cuántos corazones de vida ha consumido el jugador (para tope y para reaplicar el bonus)
+    public static final Supplier<AttachmentType<Integer>> LIFE_HEARTS =
+            ATTACHMENTS.register("life_hearts", () -> AttachmentType
+                    .builder(() -> 0)
+                    .serialize(com.mojang.serialization.Codec.INT)
+                    .copyOnDeath()
+                    .build());
+
     private IPAttachments() {}
 }
