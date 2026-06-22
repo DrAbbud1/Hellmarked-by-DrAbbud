@@ -17,7 +17,7 @@ Archivo: `config/infernalplus-common.toml`
 - `affectBosses` (Wither / Ender Dragon)
 - `whitelistMode` + `entityWhitelist` / `entityBlacklist`
 
-## Compilar
+## Compilar Proyecto
 ```
 ./gradlew build
 ```
